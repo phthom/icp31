@@ -367,12 +367,11 @@ The end of the installation should look like this :
 
 > Note that during a simple installation, there are **no failures and no errors**. If some errors occur and the install exits then first retry the install command and follow the instructions. If it doesn't work then "uninstall" ICP, correct the issue and restart the install process.
 
-**In case of Uninstall**
+**<u>In case of Uninstall</u>**
 
 ```console
 docker run -e LICENSE=accept --net=host -t -v "$(pwd)":/installer/cluster ibmcom/icp-inception:3.1.0 uninstall
 ```
-
 
 **BEFORE GOING TO THE NEXT STEP, WAIT 2 MINUTES** so that everything can start gracefully.
 
@@ -638,10 +637,10 @@ ID             Private IP      Machine Type   State
 mycluster-m1   169.50.200.70   -              deployed 
 ```
 
-Among all sub-commands in 'ibmcloud pr', there are some commands to manage the infrastructure components like :
+Among all sub-commands in **cloudctl**, there are some commands to manage the infrastructure components like :
 - cluster
 - workers (adding, removing ...)
-- register (docker image management )
+- registry (docker image management )
 - helm repositories
 
 
@@ -676,14 +675,14 @@ spec:
   accessModes:
   - ReadWriteOnce
   capacity:
-    storage: 200Gi
+    storage: 100Gi
   hostPath:
     path: /tmp/data01
   persistentVolumeReclaimPolicy: Recycle
 ```
 Save the file (ctrl O, enter, ctrl X ).
 
-With that document, we are telling Kubernetes to create a persistent storage of 200GB with **read/write once** mode in the host path /tmp/data01.
+With that document, we are telling Kubernetes to create a persistent storage of 20GB with **read/write once** mode in the host path /tmp/data01.
 
 To create this persistent volume, just type the following command:
 
@@ -691,7 +690,7 @@ To create this persistent volume, just type the following command:
 
 ![Persistent Storage Creation](./images/pv-create1.png)
 
-Now create a 2GB persistent storage volume with read/write/many mode:
+Now create a 100GB persistent storage volume with read/write/many mode:
 
 `nano pv-rwm.yaml`
 
@@ -706,7 +705,7 @@ spec:
   accessModes:
   - ReadWriteMany
   capacity:
-    storage: 200Gi
+    storage: 100Gi
   hostPath:
     path: /tmp/data01
   persistentVolumeReclaimPolicy: Recycle
@@ -719,8 +718,6 @@ And then use the following command:
 Once created these 2 volumes (hostpath) should be listed with the following command:
 
 `kubectl get pv`
-
-![Persistent Volume](./images/pv-volumes.png)
 
 > Note: the 2 volumes are shown as available storage.
 
