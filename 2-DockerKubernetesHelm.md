@@ -1145,7 +1145,7 @@ Create a new service:
 
 Take a note of the NodePort in the description. The NodePord is working against the public IP address of the worker node (in this case this is our unique **ipaddress**)
 
-Perform a curl http://<public-IP>:<nodeport> to confirm your new code is active or open a browser and 
+Perform a curl http://ipaddress:<nodeport> to confirm your new code is active or open a browser and 
 
 ![New Application up and running](./images/NewApp.png)
 
@@ -1742,7 +1742,7 @@ Of course, you can customize the README.MD and add an icon to make the chart mor
 
 # Conclusion
 
-Congratulations, you have successfully completed this Containers lab!.  You've deployed a few Docker-based web applications on IBM Cloud Private!  In this lab, you learned how to tag and push local images to ICP, inspect pushed images for security vulnerabilities, and run hosted multi-container applications on IBM Containers.
+Congratulations, you have successfully completed this Containers lab ! You've deployed a few Docker-based web applications on IBM Cloud Private!  In this lab, you learned how to tag and push local images to ICP, inspect pushed images in Kubernetes cluster, deployed different versions of an application and run Helm install to simplify the deployment of multiple kubernetes artifacts.
 
 ---
 
