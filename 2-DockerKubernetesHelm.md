@@ -372,10 +372,6 @@ First you can remove the containers one by one or you can remove a list of conat
 
 `docker rm 86e03a440240 f6f98df3dab5`
 
-The other option is to **remove all the containers** by using the 
-
- `docker rm -v -f $(docker ps -a -q)`
-
 In that command, the second part of the command will display all the container ids (not only the couchdb ones) and then the first part will remove all containers 
 
 ```
@@ -508,7 +504,7 @@ CMD ["date"]
 Then **build** and run the myimage container:
 
 ```console
-# docker run -it myimage
+# docker run myimage
 Mon Apr 16 12:44:10 UTC 2018
 ```
 
