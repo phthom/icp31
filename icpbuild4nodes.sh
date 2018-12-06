@@ -3,6 +3,8 @@
 # This shell should be executer on the MASTER node
 # Ubuntu 16.04
 # Needs sshpass, args, ICP 3.1.0
+# 4 VM should have been prepared before the execution
+# Collect IPs and passwords for all VMs
 
 
 # Credentials variables to be set before execution
@@ -40,8 +42,11 @@ echo "$WORKER2IP ${PREFIX}w2.ibm.ws ${PREFIX}w2" >> /etc/hosts
 
 cat << 'END' > dockerinstall.sh
 apt-get -q update
-apt-get -y install apt-transport-https ca-certificates curl software-properties-common 
+apt-get -y install apt-transport-https ca-certificates curl software-properties-common
 sysctl -w vm.max_map_count=262144
+swapoff -a
+sed -i '/ swap / s/^/#/' /etc/fstab
+echo "vm.max_map_count=262144" >> /etc/sysctl.conf
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 apt-get -q update
@@ -92,10 +97,16 @@ $PROXYIP
 $MASTERIP
 END
 
+# Change some parameters in the config.yaml file before ICP installation
+
+sed -i 's/istio: disabled/istio: enabled/g' /opt/icp/cluster/config.yaml
+sed -i 's/default_admin_password: admin/default_admin_password: admin/g' /opt/icp/cluster/config.yaml
 
 # Installation ICP
 cd /opt/icp/cluster
 docker run -e LICENSE=accept --net=host -t -v "$(pwd)":/installer/cluster ibmcom/icp-inception:3.1.0 install
+
+# Install kubctl
 docker run -e LICENSE=accept --net=host -v /usr/local/bin:/data ibmcom/icp-inception:3.1.0 cp /usr/local/bin/kubectl /data
 
 # Connection to ICP on the master
@@ -118,13 +129,21 @@ chmod +x connect2icp.sh
 ./connect2icp.sh
 
 # CLI installation
+curl -kLo cloudctl-linux-amd64-3.1.0-715 https://ipaddress:8443/api/cli/cloudctl-linux-amd64
+
 curl -fsSL https://clis.ng.bluemix.net/install/linux | sh
-wget https://mycluster.icp:8443/api/cli/icp-linux-amd64 --no-check-certificate
-ibmcloud plugin install icp-linux-amd64
-ibmcloud plugin install dev -r Bluemix
+chmod 755 /root/cloudctl-linux-amd64-3.1.0-715
+mv /root/cloudctl-linux-amd64-3.1.0-715 /usr/local/bin/cloudctl
+cloudctl login -a https://mycluster.icp:8443 --skip-ssl-validation -u admin -p admin -c "mycluster Account" -n default
+cd
+curl -O https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz
+tar -vxhf helm-v2.9.1-linux-amd64.tar.gz
+export PATH=/root/linux-amd64:$PATH
+helm init --client-only
+helm version --tls
+docker login mycluster.icp:8500 -u admin -p admin
 
-
-# Persistent Volumes
+# Persistent Volumes creation
 cd /tmp
 mkdir data01
 
@@ -158,7 +177,21 @@ spec:
   persistentVolumeReclaimPolicy: Recycle
 EOF
 
-cd /root
+# Change in the number of pods per core to avoid insufficient pods
+
+cd
+rm test.yaml
+cp /etc/cfc/kubelet/kubelet-service-config ./kubelet-dynamic-config
+sed -i 's/podsPerCore: 10/podsPerCore: 80/g' ./kubelet-dynamic-config
+kubectl -n kube-system create configmap my-node-config --from-file=kubelet=kubelet-dynamic-config --append-hash -o yaml > test.yaml 
+CONFIG_MAP_NAME=`grep '/api/v1/namespaces/kube-system/configmaps/' test.yaml | tail -n1 | cut -c 55-`
+
+echo $CONFIG_MAP_NAME
+
+kubectl patch node ${MASTERIP} -p "{\"spec\":{\"configSource\":{\"configMap\":{\"name\":\"${CONFIG_MAP_NAME}\",\"namespace\":\"kube-system\",\"kubeletConfigKey\":\"kubelet\"}}}}"
+kubectl patch node ${PROXYIP} -p "{\"spec\":{\"configSource\":{\"configMap\":{\"name\":\"${CONFIG_MAP_NAME}\",\"namespace\":\"kube-system\",\"kubeletConfigKey\":\"kubelet\"}}}}"
+kubectl patch node ${WORKER1IP} -p "{\"spec\":{\"configSource\":{\"configMap\":{\"name\":\"${CONFIG_MAP_NAME}\",\"namespace\":\"kube-system\",\"kubeletConfigKey\":\"kubelet\"}}}}"
+kubectl patch node ${WORKER2IP} -p "{\"spec\":{\"configSource\":{\"configMap\":{\"name\":\"${CONFIG_MAP_NAME}\",\"namespace\":\"kube-system\",\"kubeletConfigKey\":\"kubelet\"}}}}"
 
 
-
+# END OF SCRIPT
