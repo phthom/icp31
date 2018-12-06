@@ -78,6 +78,38 @@ There are several prerequisites:
 - Create a secret so Microclimate can securely use Helm.
 - Set the Microclimate and Jenkins hostname values
 
+
+
+#### Create a new ClusterImagePolicy
+
+Microclimate pipelines pull images from repositories other than `docker.io/ibmcom`. To use Microclimate pipelines, you must ensure you have a cluster image policy that permits images to be pulled from these repositories.
+
+A new cluster image policy can be created with the necessary image repositories by saving the template below into a `mycip.yaml` file and using the following command:
+
+```
+kubectl create -f - <<EOF
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ClusterImagePolicy
+metadata:
+  name: microclimate-cluster-image-policy
+spec:
+  repositories:
+  - name: mycluster.icp:8500/*
+  - name: docker.io/maven:*
+  - name: docker.io/lachlanevenson/k8s-helm:*
+  - name: docker.io/jenkins/*
+  - name: docker.io/docker:*
+EOF
+```
+
+Result:
+
+```
+clusterimagepolicy.securityenforcement.admission.cloud.ibm.com/microclimate-cluster-image-policy created
+```
+
+
+
 ### Create a namespace
 
 We are going to install Microclimate into a new namespace called "microclimate". For Jenkins, it will be installed in an isolated namespace.
@@ -131,9 +163,9 @@ OK
 
 ### Add persistent volumes
 
-<u>Some persistent volumes have been created in the installation lab.</u>
+We need to create some persistent volumes before we start.
 
-If not, create a file with that command:
+So, create a file with that command:
 
 `nano pv-mc.yaml`
 

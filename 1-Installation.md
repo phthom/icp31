@@ -99,7 +99,7 @@ This lab is going to focus on the couple "Docker & Kubernetes" which is the main
 # 2. Objectives
 
 
-In this first lab, you will prepare and install IBM Cloud Private (ICP) on a **single node** (host) running on a VM (thru VMware or it could be a Virtual Server in a Cloud or a VirtualBox).
+In this first lab, you will prepare and install IBM Cloud Private (ICP) on a **single node** (host) running on a VM (this is a virtual Server in IBM Cloud).
 
 You will learn how to:
 
@@ -108,6 +108,7 @@ You will learn how to:
 - check and validate all the prerequisites
 - install Docker and Hyperkube
 - check all the components
+- install different CLIs and other modifications to the cluster
 
 
 # 3. Prerequisites
@@ -117,8 +118,8 @@ This lab needs some hardware and software prerequisites.
 At least (minimal):
 - [ ] one host (physical or virtual)
 - [ ] CPU = 8 cores (or virtual cores)
-- [ ] RAM = 16 GB (10,240 MB)
-- [ ] Storage = 250 GB (depending on the other solutions that you install on top of ICP)
+- [ ] RAM = 32 GB
+- [ ] Storage = 300 GB (depending on the other solutions that you install on top of ICP)
 - [ ] Linux OS like Ubuntu 16.04 LTS 
 
 If you need some more help, see the official documentation: [here](https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.0/kc_welcome_containers.html)
@@ -127,19 +128,19 @@ or
 
 https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.0/kc_welcome_containers.html
 
-# 4. Install ICP on Ubuntu VM
+# 4. Install ICP on a Ubuntu VM
 
 Be sure that you have already prepared a VMware VM or a virtual server containing an **Ubuntu** system up and running. Login to the Ubuntu system as **root** or sudo -i once connected.
 
 > **ipaddress** is the ip address of the VM and subsequently the ip address of the different nodes in this lab.
+>
+> Use **putty** or **ssh** to get connected to the ubuntu VM.
 
 Here are the steps:
 
 ### Task 1 : Configuring the system
 
 Before updating the operating system, check the **/etc/hosts** file in Linux.
-
-Use **putty** or **ssh** to get connected to the ubuntu VM.
 
 `ssh root@ipaddress`
 
@@ -176,6 +177,12 @@ You should have the following lines already in the file:
 > Note : you can see some IP v6 definitions - **don't touch them**
 
 > **Don't touch the hostnames**
+
+
+
+**Very important : Don't touch or change the hostnames at this step or later on.**
+
+
 
 Change the line containing **127.0.1.1** with your **ipaddress**. So it look like:
 
@@ -270,6 +277,8 @@ You can look around at the docker CLI (and go thru some of  the sub-commands) by
 
 Another lab will go in detail to explain how Docker is managing the images and running them.
 
+
+
 ### Task 5: Download IBM Cloud Private
 
 We are going to use Docker to download the ICP-ce (community edition) package from the **dockerHub** web site:
@@ -295,6 +304,7 @@ docker run -e LICENSE=accept -v "$(pwd)":/data ibmcom/icp-inception:3.1.0 cp -r 
 > Note:  this docker command is executing the linux copy (cp) command from the volume (-v parameter). This will create a cluster directory in /opt/icp with all necessary files.
 
 
+
 ### Task 6: SSH Keys setup
 
 We are going to generate new ssh keys in the /opt/icp/cluster directory:
@@ -311,7 +321,14 @@ We are going to generate new ssh keys in the /opt/icp/cluster directory:
 
 `ls /opt/icp/cluster`
 
-![Generate new keys](./images/keys.png)
+Results:
+
+```bash
+# ls /opt/icp/cluster
+cfc-certs  cfc-components  cfc-keys  config.yaml  hosts  logs  misc  ssh_key
+```
+
+
 
 ### Task 7: Customize ICP
 
@@ -321,15 +338,36 @@ Add the IP address of each node in the cluster to the **/opt/icp/cluster/hosts f
 
 `nano /opt/icp/cluster/hosts`
 
-![ip configuration of ICP](./images/config-icp.png)
+Results:
+
+```bash
+[master]
+169.51.44.149
+
+[worker]
+169.51.44.149
+
+[proxy]
+169.51.44.149
+
+[management]
+169.51.44.149
+
+#[va]
+#5.5.5.5
+```
+
+
+
+The last 2 lines (concerning va - vulnerability advisor) will stay commented.
 
 Save the file (ctrl O, enter, ctrl X ).
 
-To understand the installation setup, you can look at the /opt/icp/cluster/config.yaml where you will find all the parameters.
+To understand the installation setup, you can look at the **/opt/icp/cluster/config.yaml** where you will find all the parameters before the start of the installation.
 
 `nano /opt/icp/cluster/config.yaml`
 
-We are going to change the "config.yaml" file (**be carefull**) :
+We are going to change the "config.yaml" file (**be carefull** this is a YAML file and you are not allowed to use TAB or any cyrillic characters) :
 
 Find the line with :
 
@@ -341,9 +379,15 @@ Change that line with the following:
 
 You can have a look into that file (there is a lot of features that you can implement like GlusterFS or VMware network SDN).
 
+If you want to also **change the admin password**, find it in the config.yaml file:
+
+`default_admin_password: admin`
+
+Change it to something else but take a note of the new password.
+
 Save the file (Ctrl+o, Enter, Ctrl+x)
 
-> *hosts* and *config.yaml* are the 2 most important files to parameter in the ICP installation. In a "standard configuration" with multiple worker nodes, you should specify a list of IP addresses under the worker section in the *hosts* file. At the time of this version, only ip addresses are supported in the *hosts* file.
+> *hosts* and *config.yaml* are the 2 most important files to parameter during the ICP installation. In a "standard configuration" with multiple worker nodes, you should specify a list of IP addresses under the worker section in the *hosts* file. At the time of this version, only ip addresses are supported in the *hosts* file.
 
 **You are now ready to install IBM Cloud Private**.
 
@@ -373,7 +417,7 @@ The end of the installation should look like this :
 docker run -e LICENSE=accept --net=host -t -v "$(pwd)":/installer/cluster ibmcom/icp-inception:3.1.0 uninstall
 ```
 
-**BEFORE GOING TO THE NEXT STEP, WAIT 2 MINUTES** so that everything can start gracefully.
+**BEFORE GOING TO THE NEXT STEP, WAIT a few MINUTES** so that everything can start gracefully.
 
 
 Use the green link at the end of the installation script to get access to the console (admin/admin) in a browser:
@@ -798,7 +842,100 @@ WARNING! Using --password via the CLI is insecure. Use --password-stdin.
 Login Succeeded
 ```
 
-At this point, you can now go thru some other labs to implement applications using containers and Kubernetes solutions.
+
+
+### 11. Last important step before starting the labs
+
+One other point, we noticed during the labs is the **number of pods per core** limited to 10.
+
+To solve that issue, follow the instructions otherwise you will get a message saying 
+
+`insufficient pods0/1` during launch of a new deployment in Kubernetes.
+
+First copy a config file example to anther place:
+
+`cp /etc/cfc/kubelet/kubelet-service-config ./kubelet-dynamic-config`
+
+Edit the ./kubelet-dynamic-config file
+
+`nano ./kubelet-dynamic-config` 
+
+Find the **podsPerCore** parameter (should be 10) and change it to 80 :
+
+```
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+staticPodPath: "/etc/cfc/pods"
+rotateCertificates: true
+authentication:
+  x509:
+    clientCAFile: "/etc/cfc/kubelet/ca.crt"
+  webhook:
+    enabled: true
+  anonymous:
+    enabled: false
+authorization:
+  mode: AlwaysAllow
+clusterDomain: "cluster.local"
+clusterDNS:
+  - "10.0.0.10"
+cgroupDriver: "cgroupfs"
+featureGates:
+  ExperimentalCriticalPodAnnotation: true
+readOnlyPort: 0
+protectKernelDefaults: true
+maxPods: 1000
+podsPerCore: 80
+failSwapOn: false
+streamingConnectionIdleTimeout: "4h0m0s"
+eventRecordQPS: 0
+```
+
+Save the file (ctrl+o, enter, ctrl+x).
+
+Create the ConfigMap by pushing the configuration file to the control plane:
+
+`kubectl -n kube-system create configmap my-node-config --from-file=kubelet=kubelet-dynamic-config --append-hash -o yaml`
+
+Results:
+
+```
+apiVersion: v1
+data:
+  kubelet: |
+    {...}
+kind: ConfigMap
+metadata:
+  creationTimestamp: 2017-09-14T20:23:33Z
+  name: my-node-config-gkt4c2m4b2
+  namespace: kube-system
+  resourceVersion: "119980"
+  selfLink: /api/v1/namespaces/kube-system/configmaps/my-node-config-gkt4c2m4b2
+  uid: 946d785e-998a-11e7-a8dd-42010a800006
+```
+
+Take a note of the self link : `my-node-config-gkt4c2m4b2`that could be different for you.
+
+Set these 2 variables by typing (don't forget to change to your ipaddress):
+
+```
+NODE_NAME=ipaddress
+CONFIG_MAP_NAME=my-node-config-gkt4c2m4b2
+```
+
+Then execute the following command:
+
+```
+kubectl patch node ${NODE_NAME} -p "{\"spec\":{\"configSource\":{\"configMap\":{\"name\":\"${CONFIG_MAP_NAME}\",\"namespace\":\"kube-system\",\"kubeletConfigKey\":\"kubelet\"}}}}"
+```
+
+Verify the update:
+
+`kubectl get node ${NODE_NAME} -o yaml`
+
+
+
+**At this point, you can now go thru some other labs to implement applications using containers and Kubernetes solutions.**
 
 
 # 5. Conclusion
@@ -843,11 +980,11 @@ This tutorial describes how to change the admin password.
 
 > ATTENTION : This procedure could be dangerous - Knowing **vi** is a prerequisite.
 
-### Task B1 - Login to your ICP cluster using ssh
+### 1. Login to your ICP cluster using ssh
 
 `ssh root@ipaddress`
 
-### Task B2 - Generate your new ICP password in base64
+### 2. Generate your new ICP password in base64
 
 `echo -n "MyNewPassword"| base64`
 
@@ -861,7 +998,7 @@ TXlOZXdQYXNzd29yZA==
 > Attention choose a very specific password to your ICP (containing capital letters and numbers and special characters ...)
 > **Take a note of the  encrypted password**
 
-### Task B3 - Edit ICP secrets
+### 3. Edit ICP secrets
 
 `kubectl -n kube-system edit secrets platform-auth-idp-credentials`
 
@@ -872,17 +1009,20 @@ Results :
 error: You must be logged in to the server (Unauthorized)
 ```
 
-> If you see that message then use the ./connect2ICP.sh to reconnect to the cluster.
+> If you see that message then use the ./connect2icp.sh to reconnect to the cluster.
 
 `kubectl -n kube-system edit secrets platform-auth-idp-credentials`
 
 Results :
-![vi secrets](../../../../IBMCloud%20Private/Workshops/WS-ICP-Sept%202018/LAB/images/visecrets.png)
+
+![visecrets](images/visecrets.png)
+
+
 
 This command opens up the **vi** text editor on the secrets file.
 Locate the **admin-password** and change the existing encrypted password with the one that you generated.
 Don't change anything else in the file.
-Save your work : **escape  :wq!**
+Save your work : **escape  :wq**
 
 
 

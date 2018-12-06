@@ -51,8 +51,6 @@ Is that all ? As far as the static data path is concerned, yes. It’s just a co
 
 ### Table of Contents
 
-
-
 - [Task 1: Isolation Policy Demo](#task-1--isolation-policy-demo)
     + [Enable Isolation](#enable-isolation)
     + [Allow Access using a NetworkPolicy](#allow-access-using-a-networkpolicy)
@@ -71,7 +69,29 @@ Is that all ? As far as the static data path is concerned, yes. It’s just a co
 To interact with Calico agents and components in a Kubernetes cluster, we use don't manipulate directly Calico but we use a Kubernetes NetwokPolicy to define the different network security rules. 
 This lab provides a simple way to try out Kubernetes **NetworkPolicy** with Calico. It requires a Kubernetes cluster configured with Calico networking, and expects that you have kubectl configured to interact with the cluster.
 
-And then define a new namespace in the cluster:
+A new cluster image policy should be created with the necessary image repositories by using the following command (copy and paste all the lines):
+
+```
+kubectl create -f - <<EOF
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ClusterImagePolicy
+metadata:
+  name: nginx-cluster-image-policy
+spec:
+  repositories:
+  - name: docker.io/nginx*
+EOF
+```
+
+Result:
+
+```
+clusterimagepolicy.securityenforcement.admission.cloud.ibm.com/nginx-cluster-image-policy created
+```
+
+
+
+We also need to define a new namespace in the cluster:
 
 `kubectl create ns policy-demo`
 

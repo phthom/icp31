@@ -6,7 +6,7 @@
 
 
 
-# Using the Ingress Control as a Router
+# Using the Ingress Control as a Router in ICP
 
 
 
@@ -200,11 +200,9 @@ Testing foo:  bar
 
 ```
 
-You can also go to your browser and type `https://169.51.44.149//helloworld/phil
+You can also go to your browser and type `https://ipaddress//helloworld/phil`
 
-![image-20181204195630073](images/image-20181204195630073.png)
-
-
+![image-20181206122129771](images/image-20181206122129771.png)
 
 #### Enabling access logging
 
@@ -258,24 +256,22 @@ curl -k $PROXY/helloworld/phil; echo
 curl -k $PROXY/foo/bar; echo
 ```
 
+And now we can view the logs for the pod.   In IBM Cloud Private, the pod name for the Ingress starts with nginx-ingress.   You can list the pods **`kubectl get pods –namespace=kube-system`** to find the list of pods.
 
+`kubectl get pods -n=kube-system | grep nginx`
 
-
-
-And now we can view the logs for the pod.   In IBM Cloud Private, the pod name for the Ingress starts with nginx-ingress-lb.   You can list the pods **`kubectl get pods –namespace=kube-system`** to find the list of pods.
-
-
+Results:
 
 ```
 # kubectl get pods -n=kube-system | grep nginx
 nginx-ingress-controller-smzfw  
 ```
 
-
-
 Once I located my pod, I ran the following command:
 
+`kubectl logs nginx-ingress-controller-smzfw  -n=kube-system`
 
+Results:
 
 ```
 # kubectl logs nginx-ingress-controller-smzfw  -n=kube-system
@@ -306,7 +302,7 @@ I1204 13:57:00.622823       7 event.go:218] Event(v1.ObjectReference{Kind:"Confi
 127.0.0.1 - [127.0.0.1] - - [04/Dec/2018:19:09:59 +0000] "GET /foo/bar HTTP/1.1" 200 17 "-" "curl/7.47.0" 84 0.002 [default-node-app-9080] 10.1.155.63:9080 17 0.000 200 b8931fddcd5cb123ed56275118af3728
 ```
 
-
+You can see all requests incoming thru the ingress controller.
 
 # Conclusion
 

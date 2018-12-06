@@ -51,82 +51,7 @@ Client: &version.Version{SemVer:"v2.9.1", GitCommit:"20adb27c7c5868466912eebdf66
 Server: &version.Version{SemVer:"v2.9.1+icp", GitCommit:"843201eceab24e7102ebb87cb00d82bc973d84a7", GitTreeState:"clean"}
 ```
 
-**If you get this valid answer, then skip the rest of the section Task1.**
-
-If you get the following answer:
-```console
-# helm version --tls
-helm: command not found
-```
-
-Then install helm:
-
-```console
-cd
-curl -O https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz
-tar -vxhf helm-v2.9.1-linux-amd64.tar.gz
-export PATH=/root/linux-amd64:$PATH
-```
-
-This command will download the helm file to /usr/local/bin directory.
-
-Set an environment variable:
-
-```console
-export HELM_HOME=/root/.helm
-```
-
-Then init helm:
-
-`helm init --client-only`
-
-Results:
-```console
-# helm init --client-only
-Creating /root/.helm/repository
-Creating /root/.helm/repository/cache
-Creating /root/.helm/repository/local
-Creating /root/.helm/plugins
-Creating /root/.helm/starters
-Creating /root/.helm/cache/archive
-Creating /root/.helm/repository/repositories.yaml
-Adding stable repo with URL: https://kubernetes-charts.storage.googleapis.com
-Adding local repo with URL: http://127.0.0.1:8879/charts
-$HELM_HOME has been configured at /root/.helm.
-Not installing Tiller due to 'client-only' flag having been set
-Happy Helming!
-
-```
-
-After you have initialize helm client. Try the following command to see the version:
-
-`helm version --tls`
-
-Results :
-
-```console
-# helm version --tls
-Client: &version.Version{SemVer:"v2.9.1", GitCommit:"20adb27c7c5868466912eebdf6664e7390ebe710", GitTreeState:"clean"}
-Server: &version.Version{SemVer:"v2.9.1+icp", GitCommit:"843201eceab24e7102ebb87cb00d82bc973d84a7", GitTreeState:"clean"}
-```
-> The helm Client and server should be the same version (i.e. **version 2.9.1**)
-> If you get some X509 error the also type that command:
-
-`cp ~/.kube/mycluster/*.pem ~/.helm/`
-
-
-
-For the next exercise, we need to get access to the IBM Cloud Private Registry. To do so,  login to the private registry:
-
-`docker login mycluster.icp:8500 -u admin -p admin`
-
-Results:
-
-```console
-# docker login mycluster.icp:8500 -u admin -p admin
-WARNING! Using --password via the CLI is insecure. Use --password-stdin.
-Login Succeeded
-```
+**If you get this valid answer, then go to the installation lab.**
 
 
 
@@ -155,6 +80,16 @@ If you have not, log in to your cluster from the IBM Cloud Private CLI and log i
 
 `docker login mycluster.icp:8500 -u admin -p admin`
 
+Results:
+
+```console
+# docker login mycluster.icp:8500 -u admin -p admin
+WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+Login Succeeded
+```
+
+Then login with the cloudctl command:
+
 `cloudctl login -a https://mycluster.icp:8443 --skip-ssl-validation`
 
 > Use the admin/admin credentials and choose **1** and **default**.
@@ -180,58 +115,33 @@ Before we can use this archive to create a LDAP instance, we need to be sure tha
 
 For each image in a repository, an image policy scope of either `cluster` or `namespace` is applied. When you deploy an application, IBM Container Image Security Enforcement checks whether the Kubernetes namespace that you are deploying to has any policy regulations that must be applied. If a `namespace`policy does not exist, then the `cluster` policy is applied. If neither a `cluster` or `namespace` scope policy exist, your deployment fails to launch.
 
-By default this feature is active and we need to authorize the images that we want to load in a POD.
+By default this feature is **active** and we need to authorize the images that we want to load in a pod.
 
-We are going to use the ICP management Console:
+A new cluster image policy can be created with the necessary image repositories by using the following command (copy and paste all the lines):
 
-https://icpaddress:8443
-
-Login to the console with admin/admin. 
-
-To add a <u>Cluster Image Policy</u>, go to the **Menu > Manage > Resource Security**
-
-![image-20181128220823372](images/image-20181128220823372.png)
-
-You can have a look at the existing default policy:
-
-![image-20181128221015408](images/image-20181128221015408.png)
-
-In that policy, you will find a list of registries where our cluster is authorized to pull some images:
-
-![image-20181128221209851](images/image-20181128221209851.png)
-
-Click back to **Image Policy**
-
-Now let's add a new policy for our LDAP image and click on the **Create Image Policy**:
-
-![image-20181128221426344](images/image-20181128221426344.png)
-
-Fill the field as follow for the step 1:
-
-![image-20181128221554295](images/image-20181128221554295.png)
-
-Then click on **add registry button**:
-
-![image-20181128221706199](images/image-20181128221706199.png)
-
-And type: 
-
-`docker.io/osixia*`
+```
+kubectl create -f - <<EOF
+apiVersion: securityenforcement.admission.cloud.ibm.com/v1beta1
+kind: ClusterImagePolicy
+metadata:
+  name: ldap-cluster-image-policy
+spec:
+  repositories:
+  - name: docker.io/osixia*
+EOF
+```
 
 Result:
 
-![image-20181128221843579](images/image-20181128221843579.png)
+```
+clusterimagepolicy.securityenforcement.admission.cloud.ibm.com/ldap-cluster-image-policy created
+```
 
-
-
-Click **Add**. And Click **Add** a second time to add the policy:
-
-![image-20181128222007755](images/image-20181128222007755.png)
-
-
+Login to ICP console.
 
 Go to the Catalog.
-Type **open** in the search zone to retrieve openldap package.
+
+Type **open** in the search zone to retrieve **openldap** package.
 
 ![ldapcatalog](./images/ldapcatalog.png)
 

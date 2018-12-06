@@ -13,49 +13,34 @@ This lab is compatible with ICP version 3.1
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
-- [Task 1 - Working with Docker](#task-1---working-with-docker)
-    + [1. Check Docker](#1-check-docker)
-    + [2. Run Hello-World container](#2-run-hello-world-container)
-    + [3. Rerun Hello-World](#3-rerun-hello-world)
-    + [4.  List your images](#4--list-your-images)
-    + [5. Where did you get the Hello-World image ?](#5-where-did-you-get-the-hello-world-image--)
-    + [6. Start a database image](#6-start-a-database-image)
-    + [7. Listing the containers](#7-listing-the-containers)
-    + [8. Multiple instances](#8-multiple-instances)
-    + [10. Stop a container](#10-stop-a-container)
-    + [11. Stop the other container](#11-stop-the-other-container)
-    + [12. Image is still there](#12-image-is-still-there)
-    + [13. Delete the image](#13-delete-the-image)
-    + [14. List all containers](#14-list-all-containers)
-    + [15. Removing all the containers](#15-removing-all-the-containers)
-- [Task 2 - Building Docker Images](#task-2---building-docker-images)
+- [Task 1 - Building Docker Images](#task-2---building-docker-images)
     + [1. Our First Dockerfile](#1-our-first-dockerfile)
     + [2. Web Application](#2-web-application)
-- [Task 3 : Deploying Apps with Kubernetes](#task-3---deploying-apps-with-kubernetes)
+- [Task 2 : Deploying Apps with Kubernetes](#task-3---deploying-apps-with-kubernetes)
     + [1. Check kubectl](#1-check-kubectl)
     + [2. Download a GIT repo](#2-download-a-git-repo)
     + [4. Build a Docker image](#4-build-a-docker-image)
-    + [5. Log in to the cluster and push the image to the registry.](#5-log-in-to-the-cluster-and-push-the-image-to-the-registry)
+    + [5. Push the image to the registry.](#5-log-in-to-the-cluster-and-push-the-image-to-the-registry)
     + [6. View your image in the console](#6-view-your-image-in-the-console)
     + [7. Run your first deployment](#7-run-your-first-deployment)
     + [8. Expose your first service](#8-expose-your-first-service)
     + [9. Identify the NodePort](#9-identify-the-nodeport)
     + [10. Use the NodePort](#10-use-the-nodeport)
     + [11. Application troubleshooting](#11-application-troubleshooting)
-- [Task 4 : Scaling Apps with Kubernetes](#task-4---scaling-apps-with-kubernetes)
+- [Task 3 : Scaling Apps with Kubernetes](#task-4---scaling-apps-with-kubernetes)
     + [1. Clean up the current deployment](#1-clean-up-the-current-deployment)
     + [2. Run a clean deployment](#2-run-a-clean-deployment)
     + [3. Scale the application](#3-scale-the-application)
     + [4. Rollout an update to  the application](#4-rollout-an-update-to--the-application)
-- [Task 5: Understand Kubernetes manifests](#task-5--understand-kubernetes-manifests)
+- [Task 4: Understand Kubernetes manifests](#task-5--understand-kubernetes-manifests)
     + [1. Build a docker image](#1-build-a-docker-image)
     + [2. View the image](#2-view-the-image)
     + [3. View a kubernetes manifest](#3-view-a-kubernetes-manifest)
-- [Task 6 : Define a Helm chart](#task-6---define-a-helm-chart)
+- [Task 5 : Define a Helm chart](#task-6---define-a-helm-chart)
     + [1. Initialize an empty chart directory](#1-initialize-an-empty-chart-directory)
     + [2. Look at the chart directory content.](#2-look-at-the-chart-directory-content)
     + [3. Check the chart](#3-check-the-chart)
-- [Task 7 : Using Helm](#task-7---using-helm)
+- [Task 6 : Using Helm](#task-7---using-helm)
     + [1. Create a new namespace](#1-create-a-new-namespace)
     + [2. Install the chart to the training namespace](#2-install-the-chart-to-the-training-namespace)
     + [3. List the releases](#3-list-the-releases)
@@ -63,24 +48,18 @@ This lab is compatible with ICP version 3.1
     + [5. List the services](#5-list-the-services)
     + [6. List the pods](#6-list-the-pods)
     + [7. Upgrade](#7-upgrade)
-- [Task 8 : Defining the chart in the catalog](#task-8---defining-the-chart-in-the-catalog)
+    + [8. Modify the ICP catalog](#8-Modify the ICP catalog)
 - [Conclusion](#conclusion)
 
 
 # Prerequisites
 This set of instructions requires that docker is already installed and docker commands can be run from a bash shell. You can get more information at the [Docker website](https://www.docker.com/get-docker)
 
->***Note:*** This lab assumes that you are running this from a "clean" environment. Clean means that you have not used docker with the images in this lab. This is important for someone who hasn't seen docker so they can see the activity as images are downloaded.
-
-# Task 1 - Working with Docker
-
 Before starting, login to the Ubuntu VM as **root**.  
 
+# Task 1 - Building Docker Images
 
-### 1. Check Docker
-
-   The version number isn't particularly important.
-   However, you can see both the client (CLI) and the server (engine).
+Type the following command and you will see both the client (CLI) and the server (engine).
 
 `docker version`
 
@@ -111,305 +90,6 @@ Server:
 ```
 
 
-
-### 2. Run Hello-World container
-
-`docker run hello-world`
-
-Results:
-
-```
-# docker run hello-world
-Unable to find image 'hello-world:latest' locally
-latest: Pulling from library/hello-world
-d1725b59e92d: Pull complete 
-Digest: sha256:0add3ace90ecb4adbf7777e9aacf18357296e799f81cabc9fde470971e499788
-Status: Downloaded newer image for hello-world:latest
-
-Hello from Docker!
-This message shows that your installation appears to be working correctly.
-
-To generate this message, Docker took the following steps:
- 1. The Docker client contacted the Docker daemon.
- 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
-    (amd64)
- 3. The Docker daemon created a new container from that image which runs the
-    executable that produces the output you are currently reading.
- 4. The Docker daemon streamed that output to the Docker client, which sent it
-    to your terminal.
-
-To try something more ambitious, you can run an Ubuntu container with:
- $ docker run -it ubuntu bash
-
-Share images, automate workflows, and more with a free Docker ID:
- https://hub.docker.com/
-
-For more examples and ideas, visit:
- https://docs.docker.com/get-started/
-```
-
- > Notice the message **Unable to find image 'hello-world:latest locally**. First you see that the image was automatically downloaded without any additional commands. Second, the version `:latest` was added to the name of the image. We did not specify a version for this image.
- So, in that case, we pull the hello-world image from the docker Hub site and then run that container.
-
-### 3. Rerun Hello-World
-
-`docker run hello-world`
-
-Results:
-
-```
-# docker run hello-world
-
-Hello from Docker!
-This message shows that your installation appears to be working correctly.
-
-To generate this message, Docker took the following steps:
- 1. The Docker client contacted the Docker daemon.
- 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
-    (amd64)
- 3. The Docker daemon created a new container from that image which runs the
-    executable that produces the output you are currently reading.
- 4. The Docker daemon streamed that output to the Docker client, which sent it
-    to your terminal.
-
-To try something more ambitious, you can run an Ubuntu container with:
- $ docker run -it ubuntu bash
-
-Share images, automate workflows, and more with a free Docker ID:
- https://hub.docker.com/
-
-For more examples and ideas, visit:
- https://docs.docker.com/get-started/
-
-```
-
-> Notice that the message **Unable to find the image** has disappeared. The image has been stored locally on the system file system (in a cache). 
-
-
-### 4.  List your images
-
- `docker images hello-world`
-
-  Results:
-
-```
-# docker images hello-world
-REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-hello-world         latest              4ab4c602aa5e        2 months ago        1.84kB
-```
-
-
-
-
-### 5. Where did you get the Hello-World image ? 
-
-Go to `https://hub.docker.com/_/hello-world/` and you can read about this image. Docker-hub is a registry that holds docker images for use. Docker-hub is not the only registry, IBM Cloud Public can serve as a docker registry. You can also have (or define) private registries.
-
-![dockerHub](./images/dockerhubhello.png) 
-
-### 6. Start a database image
-
-This image is atypical.
-
-When an image is run it usually continues to run forever.
-
-The running image is called a container. Let us run a more typical image. This image contains the noSQL database "couchDB".
-
-`docker run -d couchdb`
-
-Results:
-
-```
-# docker run -d couchdb
-Unable to find image 'couchdb:latest' locally
-latest: Pulling from library/couchdb
-bc9ab73e5b14: Pull complete 
-42dc232908d3: Pull complete 
-effb777c3c01: Pull complete 
-38df29dbabab: Pull complete 
-0a226ee2941e: Pull complete 
-5ae00be45091: Pull complete 
-a7715f255171: Pull complete 
-848ca59c2086: Pull complete 
-1912f893919f: Pull complete 
-42ed02440dad: Pull complete 
-Digest: sha256:7d60986a0b43015711121909c50b94dd6a1a6520f8f4bc72f52109b9ea8a17ad
-Status: Downloaded newer image for couchdb:latest
-f6f98df3dab52af18826f6311d0b85ff554da4d208a0c951cd3209e28de3b6d1
-```
-
-
-
- The output above was captured while the image was still downloading from docker-hub. When the download is down you don't see anything from the container, like with hello-world. Instead you see a long hex id like `f6f98df3dab52af18826f6311d0b85ff554da4d208a0c951cd3209e28de3b6d1`. **This is the id of the container**.
-
-### 7. Listing the containers 
-
-Notice only the first part of that long hex id is displayed. Typically this is more than enough to uniquely identify that container. `docker ps` provides information about when the container was created, how long it has been running, then name of the image as well as the name of the container. Note that each container must have a unique name. You can specify a name for each container as long as it is unique.
-
-`docker ps | grep couchdb`
-
-Results:
-
-```
-# docker ps | grep couchdb
-f6f98df3dab5        couchdb                                  "tini -- /docker-ent…"   2 minutes ago       Up 2 minutes        4369/tcp, 5984/tcp, 9100/tcp   nostalgic_raman
-```
-
-> In that case, the short container id is `f6f98df3dab5`.
-
-
-### 8. Multiple instances
-
-`docker run -d couchdb`
-
-Results:
-
-```
-docker run -d couchdb
-86e03a4402408c54eefc498772f7c1794f76797bf8aeededf7570fac58cc58c6
-```
-
-
-
-Then list the containers:
-
-`docker ps | grep couchdb`
-
-Results:
-
-```
-# docker ps | grep couchdb
-86e03a440240        couchdb                                  "tini -- /docker-ent…"   7 seconds ago       Up 6 seconds        4369/tcp, 5984/tcp, 9100/tcp   vibrant_benz
-f6f98df3dab5        couchdb                                  "tini -- /docker-ent…"   4 minutes ago       Up 4 minutes        4369/tcp, 5984/tcp, 9100/tcp   nostalgic_raman
-```
-
-Two instances of CouchDB are running on the system.
-
-### 10. Stop a container
-
-The containers look similar, but they have unique names and unique ids. 
-
-Stop the most recent container and then check to see what's running.
-
-`docker stop 86e03a440240`
-
-`docker ps | grep couchdb`
-
-Results:
-
-```
-# docker ps | grep couchdb
-f6f98df3dab5        couchdb                                  "tini -- /docker-ent…"   9 minutes ago       Up 9 minutes        4369/tcp, 5984/tcp, 9100/tcp   nostalgic_raman
-```
-
-
-### 11. Stop the other container
-
-`docker stop f6f98df3dab5`
-
-`docker ps | grep couchdb`
-
-Results:
-
-```
-docker ps | grep couchdb
-root@nicetest01:/opt/icp/cluster# 
-```
-
-
-
-### 12. Image is still there
-
-Notice that the image still exists.
-
-`docker images couchdb`
-
-Results:
-
-```
-# docker images couchdb
-REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-couchdb             latest              269ffb1d6de0        6 weeks ago         252MB
-```
-
-
-
-### 13. Delete the image 
-
-Go ahead and delete the couchdb image and double check that it is gone.
-
-`docker rmi couchdb`
-
-Results:
-
-```
-docker rmi couchdb
-Error response from daemon: conflict: unable to remove repository reference "couchdb" (must force) - container f6f98df3dab5 is using its referenced image 269ffb1d6de0
-```
-
-> This is not possible to suppress an image if you have still some running containers or some stopped containers. 
-
-
-### 14. List all containers
-> Note the `docker ps -a` will show us all the containers, not just the ones that are running but also the ones that stopped.
-You will noticed that all containers that you are listing have been stopped. 
-
-`docker ps -a | grep couchdb`
-
-Results:
-
-``` 
-# docker ps -a | grep couchdb
-86e03a440240        couchdb                                   "tini -- /docker-ent…"   12 minutes ago      Exited (143) 7 minutes ago                         vibrant_benz
-f6f98df3dab5        couchdb                                   "tini -- /docker-ent…"   16 minutes ago      Exited (143) 6 minutes ago                         nostalgic_raman 
-```
-
-### 15. Removing all the containers
-
-There are several possibilities to remove all containers. 
-
-First you can remove the containers one by one or you can remove a list of conatiners (like below):
-
-`docker rm 86e03a440240 f6f98df3dab5`
-
-In that command, the second part of the command will display all the container ids (not only the couchdb ones) and then the first part will remove all containers 
-
-```
-# docker rm -v -f $(docker ps -a -q)
-86e03a440240 
-f6f98df3dab5
-```
-
-Now you can remove your image:
-
-`docker rmi couchdb`
-
-Results:
-
-```
-# docker rmi couchdb
-Untagged: couchdb:latest
-Untagged: couchdb@sha256:7d60986a0b43015711121909c50b94dd6a1a6520f8f4bc72f52109b9ea8a17ad
-Deleted: sha256:269ffb1d6de06ceee9dc67f21ce4c9a98c72c64ae75beb717cd3891f6f17c24b
-Deleted: sha256:b549da5b72d773aa3f551f281963f5ee5afaeb95e1554414ed883b8a77482ade
-Deleted: sha256:3e7c5df29fa7db1a877f03d10bf23043f0c498589b3de1cf58c8fd17f5a495db
-Deleted: sha256:ba5d56f501c675dff6f34def72530a7f82531e861b9e170cd12f7919c02d24bb
-Deleted: sha256:a65157a50470d5e272f206dc4b8f0510d8c46232eb7ca95df2152f8706a14272
-Deleted: sha256:f10aecbb3cced0812c326635ba65cf20a41beb1aff32f82fa828a2d724eb66a6
-Deleted: sha256:c42b2e90ac44169ab618308270522285aa893099e186b63e11ee62a86f440cfb
-Deleted: sha256:915904fa121474aa29c82929a4afdb18ee0a110aa65332c8c223d2e88d008d34
-Deleted: sha256:ab2c881daebe886b683c0f9a2f41aa14c79fa5600a30d30e6a97ca137b938733
-Deleted: sha256:2405017c739965300ff17da7c6e227b504c8335c8036eceaaaeaec63b0c14148
-Deleted: sha256:f715ed19c28b66943ac8bc12dbfb828e8394de2530bbaf1ecce906e748e4fdff
-```
-
-
-
- >***Note:*** Docker images and containers can be referenced by **name** or by **id**. 
-
-
-
-# Task 2 - Building Docker Images
 
 A Dockerfile is a text file that has a series of instructions on how to build your image. It supports a simple set of commands that you need to use in your Dockerfile. There are several commands supported like FROM, CMD, ENTRYPOINT, VOLUME, ENV and more. We shall look at some of them.
 
@@ -540,6 +220,8 @@ www-data:x:33:33:www-data:/var/www:/bin/false
 operator:x:37:37:Operator:/var:/bin/false
 nobody:x:65534:65534:nobody:/home:/bin/false
 ```
+
+If it doesn't work, did you build the image ?
 
 ### 2. Web Application
 
@@ -677,7 +359,7 @@ Don't forget to **exit** from the container:
 
 
 
-# Task 3 : Deploying Apps with Kubernetes
+# Task 2 : Deploying Apps with Kubernetes
 
 
 
@@ -712,8 +394,6 @@ remote: Total 880 (delta 1), reused 2 (delta 0), pack-reused 872
 Receiving objects: 100% (880/880), 2.40 MiB | 5.19 MiB/s, done.
 Resolving deltas: 100% (445/445), done.
 ```
-
-
 
 
 ### 4. Build a Docker image 
@@ -791,12 +471,12 @@ To see the image, use the command:
 
 `docker images mycluster.icp:8500/default/hello-world:latest`
 
-### 5. Log in to the cluster and push the image to the registry. 
+### 5. Push the image to the registry
 
 Log in as user `admin` with password `admin`.
 
 `docker login mycluster.icp:8500`
-​    
+
 `docker push mycluster.icp:8500/default/hello-world`
 
  Your output should look like this.
@@ -812,8 +492,6 @@ d4db51a52ca0: Pushed
 9dfa40a0da3b: Pushed 
 latest: digest: sha256:019a5da27d6ed2a58fab45669707daf89932da7c2bc13072c41ed4fb372676af size: 1576
 ```
-
-
 
 
 ### 6. View your image in the console
@@ -975,7 +653,7 @@ Dont forget to **exit**
 
 
 
-# Task 4 : Scaling Apps with Kubernetes
+# Task 3 : Scaling Apps with Kubernetes
 
 In this lab, understand how to update the number of replicas a deployment has and how to safely roll out an update on Kubernetes. Learn, also, how to perform a simple health check.
 
@@ -1018,8 +696,6 @@ To see your changes being rolled out, you can run:
 `kubectl rollout status deployment/hello-world`
 
 The rollout might occur so quickly that the following messages might not display:
-
-
 
 ```console
 $ kubectl rollout status deployment/hello-world
@@ -1122,8 +798,6 @@ Waiting for rollout to finish: 9 of 10 updated replicas are available...
 deployment "hello-world" successfully rolled out
 ```
 
-
-
 Finally, use that command to see the result:
 
 `kubectl get replicasets`
@@ -1141,14 +815,14 @@ Create a new service:
 
 Take a note of the NodePort in the description. The NodePord is working against the public IP address of the worker node (in this case this is our unique **ipaddress**)
 
-Perform a curl http://ipaddress:<nodeport> to confirm your new code is active or open a browser and 
+Perform a curl `http://ipaddress:<nodeport>` to confirm your new code is active or open a browser and you see "Great Job for the second stage".
 
-![New Application up and running](./images/NewApp.png)
+![image-20181206113207582](images/image-20181206113207582.png)
 
-# Task 5: Understand Kubernetes manifests
+# Task 4: Understand Kubernetes manifests
 
 
-### 1. Build a docker image
+### 1. Build a new Docker image
 
 Move to the Lab 2 directory:
 
@@ -1211,10 +885,7 @@ Step 6/6 : CMD node app.js
 Removing intermediate container bac33012193b
  ---> 7d82259c0fdd
 Successfully built 7d82259c0fdd
-
 ```
-
-
 
 Then ckeck the image has been built:
 
@@ -1241,7 +912,7 @@ The push refers to repository [mycluster.icp:8500/default/hello-world]
 
 
 
-### 2. View the image
+### 2. View the image in the registry
 
 Type https://ipaddress:8443
 
@@ -1251,14 +922,14 @@ Type https://ipaddress:8443
 
 ![New version](./images/version.png)
 
-### 3. View a kubernetes manifest
+### 3. Analyse a Kubernetes manifest
 
 Open the **healthcheck.yml** file
 
 `nano healthcheck.yml`
 
 - the symbol `---` indicates a delimiter for a new resource
-- Note that there are 2 resources being deployed here, a deployment and a service.
+- Note that there are 2 resources being deployed here, a **deployment** and a **service**.
 - The metadata section defines the attributes of the resource (name, annotation, label etc), while the spec specifies the detail of the resource
 
 Review the deployment's manifest
@@ -1290,7 +961,7 @@ spec:
 ---
 ```
 
-- Look into the deployment and see that the spec contains a ReplicaSet (see the `replicas` term) and that the ReplicaSet includes a Pod
+- Look into the deployment and see that the **spec** contains a ReplicaSet (see the `replicas` term) and that the ReplicaSet includes a Pod
 - The Pod is defined as a template that contains the similar structure of metadata and specification
 - The specification of the pod includes an array of containers that refers to an image.
 - The livenessProbe and readinessProbe are checks that the kubernetes system would perform to check pod's health.
@@ -1318,17 +989,32 @@ spec:
 - The service defines the accessibility of a pod. This service is of type NodePort, which exposes an internal Port (8080) into an externally accessible nodePort through the proxy node (here port 30072)
 - How does a service know which pod are associated with it?  From the selector(s) that would select all pods with the same label(s) to be load balanced.
 
-# Task 6 : Define a Helm chart
+# Task 5 : Define a Helm chart
 
 Now that you have understood the structure of a kubernetes manifest file, you can start working with helm chart. Basically a helm chart is a collection of manifest files that are deployed as a group. The deployment includes the ability to perform variable substitution based on a configuration file.
 
-### 1. Initialize an empty chart directory
+### 1. Check Helm
+
+`helm version —tls`
+
+Results:
+
+```console 
+# helm version --tls
+Client: &version.Version{SemVer:"v2.9.1", GitCommit:"20adb27c7c5868466912eebdf6664e7390ebe710", GitTreeState:"clean"}
+Server: &version.Version{SemVer:"v2.9.1+icp", GitCommit:"843201eceab24e7102ebb87cb00d82bc973d84a7", GitTreeState:"clean"}
+
+```
+
+> If you don't see the client and servers numbers or an error, then go back to the installation lab.
+
+
+
+### 2. Create an empty chart directory
 
 `cd`
 
 `helm create hellonginx`
-
-### 2. Look at the chart directory content.
 
 `cd hellonginx`
 
@@ -1340,13 +1026,16 @@ Now that you have understood the structure of a kubernetes manifest file, you ca
 ![create tree](./images/treehelm.png)
 
 
+
+Edit the value.yaml file:
+
 `nano values.yaml`
 
 Look at **values.yaml** and **modify it**. 
 
 `nano values.yaml`
 
-Replace the service section and choose a port (like 30073 for instance) with the following code:
+Replace the **service section** and choose a port (like 30073 for instance) with the following code:
 
 ```console
  service:
@@ -1413,6 +1102,7 @@ affinity: {}
 
 
 Review deployment template:
+
 `nano /root/hellonginx/templates/deployment.yaml`
 
 **Don't change anything.**
@@ -1471,10 +1161,10 @@ spec:
     {{- end }}
 ```
 
-Review the **service template**:
+Then review the **service template**:
 `nano /root/hellonginx/templates/service.yaml`
 
-Change the **-port section** with the following code:
+Change the **-port section** with the following code (don't introduce any TAB in the file):
 
         - port: {{ .Values.service.externalPort }}
           targetPort: {{ .Values.service.internalPort }}
@@ -1516,9 +1206,15 @@ Go back to the hellonginx path and check the validity of the helm chart.
 
 ![modify chart](images/lint.png)
 
+In case of error, you can :
+
+- Analyse your change
+- Check you didn't introduce any tab or cyrillic characters in the YAML files
+- Check the parenthesis in the files
 
 
-# Task 7 : Using Helm
+
+# Task 6 : Using Helm
 
 The helm chart that we created in the previous section that has been verified now can be deployed.
 
@@ -1569,6 +1265,10 @@ NOTES:
   export NODE_IP=$(kubectl get nodes --namespace training -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 ```
+
+
+
+As you can see, we installed 2 Kubernetes resources : a deployment and a service.
 
 Check the pods are running in the training namespace:
 
@@ -1643,7 +1343,7 @@ We now want to change the number of replicas to **3** (change the **replicaCount
 
 `nano values.yaml`
 
-Then upgrade hellonginx:
+Change the replicas to 3 and then upgrade hellonginx:
 
 `helm  upgrade hellonginx . --tls`
 
@@ -1674,8 +1374,7 @@ NOTES:
 
 ```
 
-
-# Task 8 : Defining the chart in the catalog
+## 8. Modify the ICP catalog
 
 A good idea is to define the chart in the catalog.
 
@@ -1728,9 +1427,11 @@ Leave the terminal and login to the ICP console with admin/admin :
 ![hello chart](images/hellonginx4.png)
 
 Click on Parameters at the bottom of the first page. 
-Find and change the release name, the namspace and the nodeport (for example 30075)
+Find and change the **release name**, the **namspace** and the **nodeport** (for example 30075)
 
 Click **Install** to see the results.
+
+Then check the application is running with `http://ipaddress:nodeport`in your browser.
 
 Of course, you can customize the README.MD and add an icon to make the chart more appealing.
 
