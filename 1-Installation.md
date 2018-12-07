@@ -15,13 +15,14 @@ This Lab is compatible with ICP version 3.1.0
 
 
 # Table of Content
+
 - [1. IBM Cloud Private Overview](#1-ibm-cloud-private-overview)
     + [What is a private Cloud ?](#what-is-a-private-cloud--)
     + [Terminology](#terminology)
     + [Architecture](#architecture)
 - [2. Objectives](#2-objectives)
 - [3. Prerequisites](#3-prerequisites)
-- [4. Install ICP on Ubuntu VM](#4-install-icp-on-ubuntu-vm)
+- [4. Install ICP on a Ubuntu VM](#4-install-icp-on-a-ubuntu-vm)
     + [Task 1 : Configuring the system](#task-1---configuring-the-system)
     + [Task 2 : Add Docker’s official GPG key](#task-2---add-docker-s-official-gpg-key)
     + [Task 3: Add a repo to get the Docker](#task-3--add-a-repo-to-get-the-docker)
@@ -32,14 +33,17 @@ This Lab is compatible with ICP version 3.1.0
     + [Task 7: Install ICP](#task-7--install-icp)
     + [Task 8: Install and configure CLIs](#task-8--install-and-configure-clis)
     + [Task 9: Adding persistent storage to Kubernetes](#task-9--adding-persistent-storage-to-kubernetes)
-    + [Task10: Installing helm](#10-installing-helm)
+    + [Task 10. Installing helm](#task-10-installing-helm)
+    + [Task 11. Last important step before starting the labs](#task-11-last-important-step-before-starting-the-labs)
 - [5. Conclusion](#5-conclusion)
     + [Results](#results)
 - [End of Lab](#end-of-lab)
 - [appendix A : How to connect to a cluster](#appendix-a---how-to-connect-to-a-cluster)
+- [appendix B : Changing ICP admin password](#appendix-b---changing-icp-admin-password)
+    + [1. Login to your ICP cluster using ssh](#1-login-to-your-icp-cluster-using-ssh)
+    + [2. Generate your new ICP password in base64](#2-generate-your-new-icp-password-in-base64)
+    + [3. Edit ICP secrets](#3-edit-icp-secrets)
 - [End of Appendix](#end-of-appendix)
-
-
 
 ---
 
@@ -772,7 +776,7 @@ Now go back to the **Dashboard** to see the change:
 
 
 
-### 10. Installing helm
+### Task 10. Installing helm
 
 Helm is a client/server application : Helm client and Tiller server.
 Before we can run any chart with helm, we should proceed to some installation and configuration.
@@ -844,7 +848,7 @@ Login Succeeded
 
 
 
-### 11. Last important step before starting the labs
+### Task 11. Last important step before starting the labs
 
 One other point, we noticed during the labs is the **number of pods per core** limited to 10.
 

@@ -12,35 +12,36 @@ This lab is compatible with ICP version 3.1
 
 ## Table of Contents
 
+
 - [Prerequisites](#prerequisites)
-- [Task 1 - Building Docker Images](#task-2---building-docker-images)
+- [Task 1 - Building Docker Images](#task-1---building-docker-images)
     + [1. Our First Dockerfile](#1-our-first-dockerfile)
     + [2. Web Application](#2-web-application)
-- [Task 2 : Deploying Apps with Kubernetes](#task-3---deploying-apps-with-kubernetes)
+- [Task 2 : Deploying Apps with Kubernetes](#task-2---deploying-apps-with-kubernetes)
     + [1. Check kubectl](#1-check-kubectl)
     + [2. Download a GIT repo](#2-download-a-git-repo)
     + [4. Build a Docker image](#4-build-a-docker-image)
-    + [5. Push the image to the registry.](#5-log-in-to-the-cluster-and-push-the-image-to-the-registry)
+    + [5. Push the image to the registry](#5-push-the-image-to-the-registry)
     + [6. View your image in the console](#6-view-your-image-in-the-console)
     + [7. Run your first deployment](#7-run-your-first-deployment)
     + [8. Expose your first service](#8-expose-your-first-service)
     + [9. Identify the NodePort](#9-identify-the-nodeport)
     + [10. Use the NodePort](#10-use-the-nodeport)
     + [11. Application troubleshooting](#11-application-troubleshooting)
-- [Task 3 : Scaling Apps with Kubernetes](#task-4---scaling-apps-with-kubernetes)
+- [Task 3 : Scaling Apps with Kubernetes](#task-3---scaling-apps-with-kubernetes)
     + [1. Clean up the current deployment](#1-clean-up-the-current-deployment)
     + [2. Run a clean deployment](#2-run-a-clean-deployment)
     + [3. Scale the application](#3-scale-the-application)
     + [4. Rollout an update to  the application](#4-rollout-an-update-to--the-application)
-- [Task 4: Understand Kubernetes manifests](#task-5--understand-kubernetes-manifests)
-    + [1. Build a docker image](#1-build-a-docker-image)
-    + [2. View the image](#2-view-the-image)
-    + [3. View a kubernetes manifest](#3-view-a-kubernetes-manifest)
-- [Task 5 : Define a Helm chart](#task-6---define-a-helm-chart)
-    + [1. Initialize an empty chart directory](#1-initialize-an-empty-chart-directory)
-    + [2. Look at the chart directory content.](#2-look-at-the-chart-directory-content)
+- [Task 4: Understand Kubernetes manifests](#task-4--understand-kubernetes-manifests)
+    + [1. Build a new Docker image](#1-build-a-new-docker-image)
+    + [2. View the image in the registry](#2-view-the-image-in-the-registry)
+    + [3. Analyse a Kubernetes manifest](#3-analyse-a-kubernetes-manifest)
+- [Task 5 : Define a Helm chart](#task-5---define-a-helm-chart)
+    + [1. Check Helm](#1-check-helm)
+    + [2. Create an empty chart directory](#2-create-an-empty-chart-directory)
     + [3. Check the chart](#3-check-the-chart)
-- [Task 6 : Using Helm](#task-7---using-helm)
+- [Task 6 : Using Helm](#task-6---using-helm)
     + [1. Create a new namespace](#1-create-a-new-namespace)
     + [2. Install the chart to the training namespace](#2-install-the-chart-to-the-training-namespace)
     + [3. List the releases](#3-list-the-releases)
@@ -48,8 +49,9 @@ This lab is compatible with ICP version 3.1
     + [5. List the services](#5-list-the-services)
     + [6. List the pods](#6-list-the-pods)
     + [7. Upgrade](#7-upgrade)
-    + [8. Modify the ICP catalog](#8-Modify the ICP catalog)
+    + [8. Define the chart in the ICP Catalog](#8-define-the-chart-in-the-icp-catalog)
 - [Conclusion](#conclusion)
+
 
 
 # Prerequisites
@@ -1371,10 +1373,9 @@ NOTES:
   export NODE_PORT=$(kubectl get --namespace training -o jsonpath="{.spec.ports[0].nodePort}" services hellonginx)
   export NODE_IP=$(kubectl get nodes --namespace training -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
-
 ```
 
-## 8. Modify the ICP catalog
+### 8. Define the chart in the ICP Catalog
 
 A good idea is to define the chart in the catalog.
 
