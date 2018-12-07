@@ -12,7 +12,7 @@ In recent years, with the development of container technology, more enterprise c
 
 This lab takes you step-by-step through the installation of Istio and the deployment of microservices-based applications in IBM Cloud Private.
 
-> **Prerequisites** : you should be logged on your VM and connected to your ICP master.
+> **Prerequisites** : you should be logged on your VM and connected to your ICP master. Istio should have been installed as part of the installation of ICP 3.1 (istio: enabled)
 
 
 ### Table of Contents
