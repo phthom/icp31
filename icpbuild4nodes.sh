@@ -177,7 +177,7 @@ spec:
   persistentVolumeReclaimPolicy: Recycle
 EOF
 
-# Change in the number of pods per core to avoid insufficient pods
+# Change the number of pods per core to avoid insufficient pods
 
 cd
 rm test.yaml
