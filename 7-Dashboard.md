@@ -4,7 +4,7 @@
 
 ---
 # Dashboard Lab
-This lab is compatible with ICP version 3.1
+This lab is compatible with ICP version 3.1.2
 
 ![](./images/dashboard-ui.png)
 This lab is compatible with ICP version 3.1

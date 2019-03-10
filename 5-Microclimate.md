@@ -12,7 +12,7 @@
 
 
 ![microclimate](images/mcmicroclimate.png)
-This lab is compatible with ICP version 3.1
+This lab is compatible with ICP version 3.1.2
 
 ---
 

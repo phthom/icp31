@@ -8,7 +8,7 @@
 # Single Node Installation - IBM Cloud Private
 ---
 
-This Lab is compatible with ICP version 3.1.0
+This Lab is compatible with ICP version 3.1.2
 
 ![ICP Logo](./images/logoicp.png)
 

@@ -129,6 +129,7 @@ chmod +x connect2icp.sh
 ./connect2icp.sh
 
 # CLI installation
+
 curl -kLo cloudctl-linux-amd64-3.1.0-715 https://ipaddress:8443/api/cli/cloudctl-linux-amd64
 
 curl -fsSL https://clis.ng.bluemix.net/install/linux | sh
@@ -144,6 +145,7 @@ helm version --tls
 docker login mycluster.icp:8500 -u admin -p admin
 
 # Persistent Volumes creation
+
 cd /tmp
 mkdir data01
 
@@ -176,6 +178,17 @@ spec:
     path: /tmp/data01
   persistentVolumeReclaimPolicy: Recycle
 EOF
+
+# Helm Install 
+
+cd
+curl -O https://storage.googleapis.com/kubernetes-helm/helm-v2.9.1-linux-amd64.tar.gz
+tar -vxhf helm-v2.9.1-linux-amd64.tar.gz
+export PATH=/root/linux-amd64:$PATH
+export HELM_HOME=/root/.helm
+helm init --client-only
+helm version --tls
+docker login mycluster.icp:8500 -u admin -p admin
 
 # Change the number of pods per core to avoid insufficient pods
 
