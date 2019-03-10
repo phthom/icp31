@@ -14,6 +14,8 @@ This Lab is compatible with ICP version 3.1.0
 
 
 
+
+
 # Table of Content
 
 - [1. IBM Cloud Private Overview](#1-ibm-cloud-private-overview)
@@ -182,15 +184,13 @@ You should have the following lines already in the file:
 
 > **Don't touch the hostnames**
 
-
-
-**Very important : Don't touch or change the hostnames at this step or later on.**
+> **Very important : Don't touch or change the hostnames at this step or later on.**
 
 
 
 Change the line containing **127.0.1.1** with your **ipaddress**. So it look like:
 
-**123.456.789.123**   myhostname.workshop	    myhostname     
+**123.456.789.123**   myhostname.workshop myhostname     
 
 Your /etc/hosts file should look like that after the change (please don't touch the hostnames):
 
@@ -249,7 +249,7 @@ Use the following 2 commands:
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 ```
 
-`apt-get update`
+`apt-get -q update`
 
 ### Task 4: Get Docker
 
@@ -287,7 +287,7 @@ Another lab will go in detail to explain how Docker is managing the images and r
 
 We are going to use Docker to download the ICP-ce (community edition) package from the **dockerHub** web site:
 
-`docker pull ibmcom/icp-inception:3.1.0`
+`docker pull ibmcom/icp-inception:3.1.2`
 
 IBM has packaged all the main components necessary for the installation in one package (note that you can change the version to a more recent one if needed). The pull sub-command is going to download the image on the local file system (the image will be run to install ICP).
 
@@ -302,7 +302,7 @@ Create a directory and move to that directory:
 Copy the ICP package into that directory:
 
 ```console
-docker run -e LICENSE=accept -v "$(pwd)":/data ibmcom/icp-inception:3.1.0 cp -r cluster /data
+docker run -e LICENSE=accept -v "$(pwd)":/data ibmcom/icp-inception:3.1.2 cp -r cluster /data
 ```
 
 > Note:  this docker command is executing the linux copy (cp) command from the volume (-v parameter). This will create a cluster directory in /opt/icp with all necessary files.
@@ -311,7 +311,7 @@ docker run -e LICENSE=accept -v "$(pwd)":/data ibmcom/icp-inception:3.1.0 cp -r 
 
 ### Task 6: SSH Keys setup
 
-We are going to generate new ssh keys in the /opt/icp/cluster directory:
+We are going to generate new ssh keys:
 
 `ssh-keygen -b 4096 -f ~/.ssh/id_rsa -N "" `
 
@@ -336,7 +336,7 @@ cfc-certs  cfc-components  cfc-keys  config.yaml  hosts  logs  misc  ssh_key
 
 ### Task 7: Customize ICP
 
-Add the IP address of each node in the cluster to the **/opt/icp/cluster/hosts file** (in our case, we use the same ip address for each component).
+Add the IP address of each node in the cluster to the **/opt/icp/cluster/hosts ** file  (in our case, we use the same ip address for each component).
 
 > Use the unique **ipaddress** that you have already used.
 
@@ -367,13 +367,13 @@ The last 2 lines (concerning va - vulnerability advisor) will stay commented.
 
 Save the file (ctrl O, enter, ctrl X ).
 
-To understand the installation setup, you can look at the **/opt/icp/cluster/config.yaml** where you will find all the parameters before the start of the installation.
+To understand the installation setup, you can look at the **/opt/icp/cluster/config.yaml** file where you will find all the parameters before the start of the installation.
 
 `nano /opt/icp/cluster/config.yaml`
 
 We are going to change the "config.yaml" file (**be carefull** this is a YAML file and you are not allowed to use TAB or any cyrillic characters) :
 
-Find the line with :
+Find the line with (we will use Istio in another lab) :
 
 `istio: disabled`
 
@@ -383,11 +383,17 @@ Change that line with the following:
 
 You can have a look into that file (there is a lot of features that you can implement like GlusterFS or VMware network SDN).
 
-If you want to also **change the admin password**, find it in the config.yaml file:
+**Change the default admin password**, find it in the config.yaml file:
 
-`default_admin_password: admin`
+`# default_admin_password:`
 
-Change it to something else but take a note of the new password.
+So add those 3 lines at the end of the config.yaml :
+
+```
+password_rules:
+- '(.*)'
+default_admin_password: admin1!
+```
 
 Save the file (Ctrl+o, Enter, Ctrl+x)
 
@@ -403,7 +409,7 @@ Finally install ICP by using those commands:
 `cd /opt/icp/cluster`
 
 ```console
-docker run -e LICENSE=accept --net=host -t -v "$(pwd)":/installer/cluster ibmcom/icp-inception:3.1.0 install
+docker run -e LICENSE=accept --net=host -t -v "$(pwd)":/installer/cluster ibmcom/icp-inception:3.1.2 install
 ```
 
 Installation should last around 20 minutes. Check messages.
@@ -424,7 +430,7 @@ docker run -e LICENSE=accept --net=host -t -v "$(pwd)":/installer/cluster ibmcom
 **BEFORE GOING TO THE NEXT STEP, WAIT a few MINUTES** so that everything can start gracefully.
 
 
-Use the green link at the end of the installation script to get access to the console (admin/admin) in a browser:
+Use the green link at the end of the installation script to get access to the console (admin/admin1!) in a browser:
 
 `https://ipaddress:8443`  
 
@@ -450,10 +456,10 @@ For that purpose, open a ssh terminal with the Ubuntu VM in root mode.
 Use the following command to download **kubectl**:
 
 ```console
-docker run -e LICENSE=accept --net=host -v /usr/local/bin:/data ibmcom/icp-inception:3.1.0 cp /usr/local/bin/kubectl /data
+docker run -e LICENSE=accept --net=host -v /usr/local/bin:/data ibmcom/icp-inception:3.1.2 cp /usr/local/bin/kubectl /data
 ```
 
-This docker command will copy the kubectl program to the /usr/local/bin.
+This is a **single** docker command will copy the kubectl program to the /usr/local/bin.
 
 We now need to configure kubectl to get access to the cluster. An alternative method can be used (see Appendix A : How to get connected to the cluster) if you are interested.
 
@@ -470,7 +476,7 @@ Copy the following code :
 CLUSTERNAME=mycluster
 ACCESS_IP=`curl ifconfig.co`
 USERNAME=admin
-PASSWD=admin
+PASSWD=admin1!
 
 token=$(curl -s -k -H "Content-Type: application/x-www-form-urlencoded;charset=UTF-8" -d "grant_type=password&username=$USERNAME&password=$PASSWD&scope=openid" https://$ACCESS_IP:8443/idprovider/v1/auth/identitytoken --insecure | jq .id_token | awk  -F '"' '{print $2}')
 
@@ -511,8 +517,8 @@ Results :
 
 ```console
 # kubectl version --short
-Client Version: v1.11.1
-Server Version: v1.11.1+icp
+Client Version: v1.12.3
+Server Version: v1.12.3+icp
 ```
 
 Try this command to show all the worker nodes :
@@ -524,7 +530,7 @@ Results :
 ```console
 # kubectl get nodes
 NAME            STATUS    ROLES     AGE       VERSION
-169.50.200.70   Ready     etcd,management,master,proxy,worker   35m       v1.11.1+icp
+169.50.200.70   Ready     etcd,management,master,proxy,worker   35m       v1.12.3+icp
 ```
 
 > After a long period of inactivity, if you see some connection error when typing a kubectl command then re-execute the `~/connect2icp.sh` command.
@@ -561,7 +567,7 @@ Finally, you can also install the **cloudctl** command. This command can be used
 
 Type the following curl command to download cloudctl (don't forget to change the ipaddress):
 
-`curl -kLo cloudctl-linux-amd64-3.1.0-715 https://ipaddress:8443/api/cli/cloudctl-linux-amd64`
+`curl -kLo cloudctl-linux-amd64-3.1.2-1203 https://ipaddress:8443/api/cli/cloudctl-linux-amd64`
 
 Results:
 
@@ -576,8 +582,8 @@ curl -kLo cloudctl-linux-amd64-3.1.0-715 https://169.50.200.70:8443/api/cli/clou
 Now execute the following commands to change cloudctl to executable and to move that CLI to the right directory :
 
 ```
-chmod 755 /root/cloudctl-linux-amd64-3.1.0-715
-mv /root/cloudctl-linux-amd64-3.1.0-715 /usr/local/bin/cloudctl
+chmod 755 /root/cloudctl-linux-amd64-3.1.2-1203
+mv /root/cloudctl-linux-amd64-3.1.2-1203 /usr/local/bin/cloudctl
 ```
 
 Execute the **cloudctl** command for the first time 
@@ -837,11 +843,11 @@ Another important step is to access to the ICP container registry.
 
 To do so,  login to the private registry:
 
-`docker login mycluster.icp:8500 -u admin -p admin`
+`docker login mycluster.icp:8500 -u admin -p admin1!`
 
 Results:
 ```console
-# docker login mycluster.icp:8500 -u admin -p admin
+# docker login mycluster.icp:8500 -u admin -p admin1!
 WARNING! Using --password via the CLI is insecure. Use --password-stdin.
 Login Succeeded
 ```
@@ -864,7 +870,7 @@ Edit the ./kubelet-dynamic-config file
 
 `nano ./kubelet-dynamic-config` 
 
-Find the **podsPerCore** parameter (should be 10) and change it to 80 :
+Find the **podsPerCore** parameter (should be 10) and change it to 80 as shown below :
 
 ```
 kind: KubeletConfiguration
@@ -899,7 +905,9 @@ Save the file (ctrl+o, enter, ctrl+x).
 
 Create the ConfigMap by pushing the configuration file to the control plane:
 
-`kubectl -n kube-system create configmap my-node-config --from-file=kubelet=kubelet-dynamic-config --append-hash -o yaml`
+```
+kubectl -n kube-system create configmap my-node-config --from-file=kubelet=kubelet-dynamic-config --append-hash -o yaml
+```
 
 Results:
 
